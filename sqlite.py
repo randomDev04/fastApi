@@ -35,9 +35,14 @@ def db_health_check():
     finally:
         db.close()
 
-@app.get("/home")
-def home(db:Session = Depends(db_health_check)):
-    return {
-        "message": "Welcome to the FastAPI application with SQLAlchemy database!",
-        "database_status": "Connected" if db else "Not Connected"
+# Create API 
+@app.post("/todos")
+def create_todo(title:str, db: Session = Depends(db_health_check)):
+    todo = Todo(title=title, completed=False)
+    db.add(todo)
+    db.commit()
+    db.refresh(todo)
+    return{
+        "message":"Todo Created",
+        "data":todo
     }
